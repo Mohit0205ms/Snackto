@@ -1,5 +1,5 @@
 import { memo, useCallback, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image, Modal } from "react-native";
 import { colors } from "../../theme/Colors";
 import { getScreenWidth } from "../../utils/LayoutUtility";
 import StaticNavigationHeader from "../../components/header/StaticNavigationHeader";
@@ -9,10 +9,45 @@ import { assetsIcon } from '../../assets/Index';
 const filterList = ['All','Home','Work', 'other'];
 
 const AddressCard = memo(({location, address = '', id = '', isSelectedAddressId = '', onSelect = () => {}}) => {
+  const [showPopover, setShowPopover] = useState(false);
+  const [popoverPosition, setPopOverPosition] = useState({top: 40, right: 20});
 
   const textConvertor = (text) => {
     const updatedText = text.length > 80 ? text.substr(0,80) + "..." : text;
     return updatedText;
+  }
+
+  const PopOver = () => {
+    const handleEditButtonPress = () => {
+      console.log('handleEditButtonPress');
+    }
+    const handleDeleteButtonPress = () => {
+      console.log('handleDeleteButtonPress');
+    }
+    return (
+      <Modal transparent visible={showPopover} onRequestClose={()=> setShowPopover(false)}>
+        <TouchableOpacity style={{...StyleSheet.absoluteFill}} onPress={()=>setShowPopover(false)}/>
+        <View style={[styles.popoverContainer,{top: popoverPosition.top, right: popoverPosition.right}]}>
+          <TouchableOpacity style={styles.popoverItem} onPress={handleEditButtonPress}>
+            <Image source={assetsIcon.edit_address} style={styles.popoverIcon} />
+            <Text style={styles.popoverText}>Edit</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.popoverItem} onPress={handleDeleteButtonPress}>
+            <Image source={assetsIcon.delete_address} style={styles.popoverIcon} />
+            <Text style={styles.popoverText}>Delete</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+    );
+  };
+
+  const handleMenuButtonClick = (event) => {
+    const {pageY, pageX} = event.nativeEvent;  
+    setPopOverPosition({
+      top: pageY + 30,
+      right: getScreenWidth() - pageX - 20
+    })
+    setShowPopover(!showPopover)
   }
   
   return (
@@ -24,16 +59,20 @@ const AddressCard = memo(({location, address = '', id = '', isSelectedAddressId 
         <View style={styles.locationContainer}>
           <Text style={styles.addressTitle}>Pg 1511, House no</Text>
           <View style={{ flexDirection: 'row', width: 55, justifyContent: 'space-between' }}>
+            {/* share button */}
             <TouchableOpacity>
               <Image source={assetsIcon.share_address} style={{width: 20, height: 20}} />
             </TouchableOpacity>
-            <TouchableOpacity>
+            {/* additional button */}
+            <TouchableOpacity onPress={handleMenuButtonClick}>
               <Image source={assetsIcon.menu} style={{width: 20, height: 20}} />
             </TouchableOpacity>
           </View>
         </View>
         <Text style={styles.addressSubtitle}>{textConvertor(address)}</Text>
       </View>
+      {/* edit and delete address option */}
+      <PopOver/>
     </TouchableOpacity>
   );
 });
@@ -48,7 +87,7 @@ const DividerWithText = ({ text = 'OR' }) => {
   );
 };
 
-const FilterPills = ({ filters, selectedFilter, onFilterSelect }) => {
+export const FilterPills = ({ filters, selectedFilter, onFilterSelect }) => {
   return (
     <View style={styles.filterContainer}>
       {filters.map((filter, index) => {
@@ -290,7 +329,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 5,
     borderRadius: 20,
-    backgroundColor: colors.light_grey,
+    backgroundColor: colors.white,
     borderWidth: 1,
     borderColor: colors.primaryColor,
   },
@@ -307,6 +346,37 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   selectedFilterText: {
+    fontSize: 14,
+    color: colors.black,
+    fontWeight: '500',
+  },
+  popoverContainer: {
+    position: 'absolute',
+    top: 40,
+    right: 20,
+    backgroundColor: colors.white,
+    borderRadius: 8,
+    padding: 8,
+    minWidth: 120,
+    shadowColor: colors.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    zIndex: 1000,
+  },
+  popoverItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+  popoverIcon: {
+    width: 20,
+    height: 20,
+    marginRight: 8,
+  },
+  popoverText: {
     fontSize: 14,
     color: colors.black,
     fontWeight: '500',

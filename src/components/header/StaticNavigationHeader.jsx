@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { colors } from '../../theme/Colors';
+import { getScreenWidth } from '../../utils/LayoutUtility';
 
 const StaticNavigationHeader = ({title, iconSrc, iconStyle = 40, buttonStyle = {}}) => {
   return (
@@ -14,6 +15,7 @@ const StaticNavigationHeader = ({title, iconSrc, iconStyle = 40, buttonStyle = {
 
 const styles = StyleSheet.create({
   container: {
+    width: getScreenWidth() - 24,
     height: 65,
     flexDirection: 'row',
     justifyContent: 'center',
