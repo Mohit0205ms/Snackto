@@ -1,25 +1,12 @@
 import { memo, useCallback, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image } from "react-native";
 import { colors } from "../../theme/Colors";
 import { getScreenWidth } from "../../utils/LayoutUtility";
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import StaticNavigationHeader from "../../components/header/StaticNavigationHeader";
-import RadioButton from '../../components/shared/RadioButton';
 import { address } from '../../dummyData/DummyData';
+import { assetsIcon } from '../../assets/Index';
 
-const ActionButton = ({
-  iconName,
-  label,
-  onPress,
-  style = {},
-}) => {
-  return (
-    <TouchableOpacity style={style} onPress={onPress}>
-      <Icon name={iconName} size={25} color={'#F14141'} />
-      <Text style={styles.buttonText}>{label}</Text>
-    </TouchableOpacity>
-  );
-};
+const filterList = ['All','Home','Work', 'other'];
 
 const AddressCard = memo(({location, address = '', id = '', isSelectedAddressId = '', onSelect = () => {}}) => {
 
@@ -35,17 +22,18 @@ const AddressCard = memo(({location, address = '', id = '', isSelectedAddressId 
     >
       <View style={styles.addressContainer}>
         <View style={styles.locationContainer}>
-          <Icon name="home" size={25} color="black" />
-          <Text>{location}</Text>
+          <Text style={styles.addressTitle}>Pg 1511, House no</Text>
+          <View style={{ flexDirection: 'row', width: 55, justifyContent: 'space-between' }}>
+            <TouchableOpacity>
+              <Image source={assetsIcon.share_address} style={{width: 20, height: 20}} />
+            </TouchableOpacity>
+            <TouchableOpacity>
+              <Image source={assetsIcon.menu} style={{width: 20, height: 20}} />
+            </TouchableOpacity>
+          </View>
         </View>
-        <Text>{textConvertor(address)}</Text>
+        <Text style={styles.addressSubtitle}>{textConvertor(address)}</Text>
       </View>
-      <RadioButton
-        isSelected={isSelectedAddressId === id}
-        size={25}
-        color={colors.primaryColor}
-        disabled={false}
-      />
     </TouchableOpacity>
   );
 });
@@ -60,8 +48,30 @@ const DividerWithText = ({ text = 'OR' }) => {
   );
 };
 
+const FilterPills = ({ filters, selectedFilter, onFilterSelect }) => {
+  return (
+    <View style={styles.filterContainer}>
+      {filters.map((filter, index) => {
+        const isSelected = selectedFilter === filter;
+        return (
+          <TouchableOpacity
+            key={index}
+            style={isSelected ? styles.selectedFilterPill : styles.filterPill}
+            onPress={() => onFilterSelect(filter)}
+          >
+            <Text style={isSelected ? styles.selectedFilterText : styles.filterText}>
+              {filter}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
+};
+
 const AddressListScreen = () => {
   const [isSelectedAddressId, setIsSelectedAddressId] = useState('1');
+  const [selectedFilter, setSelectedFilter] = useState('All');
 
   const handleAddAddress = () => {
     // Add address logic
@@ -73,6 +83,10 @@ const AddressListScreen = () => {
 
   const handleAddressSelect = (id) => {
     setIsSelectedAddressId(id);
+  };
+
+  const handleFilterSelect = (filter) => {
+    setSelectedFilter(filter);
   };
 
   const renderItem = useCallback(({item}) => {
@@ -88,25 +102,39 @@ const AddressListScreen = () => {
     );
   });
 
+  const ActionButton = ({
+    iconSrc = '',
+    label,
+    onPress,
+    style = {},
+  }) => {
+    return (
+      <TouchableOpacity style={style} onPress={onPress}>
+        <Image source={iconSrc} style={styles.actionButtonIconStyle} />
+        <Text style={styles.buttonText}>{label}</Text>
+      </TouchableOpacity>
+    );
+  };
+
   const keyExtractor = useCallback((item) => item.id.toString(), []);
 
   return (
     <View style={styles.container}>
       <StaticNavigationHeader
-        iconName={'west'}
-        iconSize={25}
-        title={'My Locations'}
+        iconSrc={assetsIcon.arrow_left}
         iconStyle={styles.iconStyle}
+        title={'My Locations'}
+        buttonStyle={styles.buttonStyle}
       />
       <View>
         <ActionButton
-          iconName="add"
+          iconSrc={assetsIcon.add_icon}
           label="Add New Address"
           onPress={handleAddAddress}
           style={styles.addAddressButtonStyle}
         />
         <ActionButton
-          iconName="my-location"
+          iconSrc={assetsIcon.current_location}
           label="Use Your Current Location"
           onPress={handleUseLocation}
           style={styles.currentLocationButtonStyle}
@@ -114,11 +142,17 @@ const AddressListScreen = () => {
         />
       </View>
       <DividerWithText text='SAVED'/>
+      <FilterPills 
+        filters={filterList}
+        selectedFilter={selectedFilter}
+        onFilterSelect={handleFilterSelect}
+      />
       <FlatList
         data={address}
         renderItem={renderItem}
         keyExtractor={keyExtractor}
         showsVerticalScrollIndicator={false}
+        style={{marginTop: 10}}
       />
     </View>
   );
@@ -129,6 +163,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   iconStyle: {
+    width: 25,
+    height: 25,
+  },
+  addressTitle: {
+    fontWeight: '700',
+  },
+  addressSubtitle: {
+    fontWeight: '500'
+  },
+  buttonStyle: {
      // iOS shadow
     shadowColor: colors.black,
     shadowOffset: { width: 0, height: 2 },
@@ -202,13 +246,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   addressContainer: {
-    width: (getScreenWidth() - 24) * 0.9,
-    maxWidth: 300,
+    width: '100%',
+    paddingVertical: 10,
+    position: 'relative',
   },
   locationContainer: {
+    width: '100%',
     flexDirection: 'row', 
     alignItems: 'center', 
-    marginBottom: 2
+    marginBottom: 10,
+    justifyContent: 'space-between',
   },
   dividerContainer: {
     flexDirection: 'row',
@@ -226,6 +273,43 @@ const styles = StyleSheet.create({
     color: '#333',
     fontWeight: '500',
     color: colors.primaryColor,
+  },
+  actionButtonIconStyle: {
+    width: 25,
+    height: 25,
+    tintColor: '#F14141'
+  },
+  filterContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: 12,
+    marginTop: 10,
+    gap: 8,
+  },
+  filterPill: {
+    paddingHorizontal: 16,
+    paddingVertical: 5,
+    borderRadius: 20,
+    backgroundColor: colors.light_grey,
+    borderWidth: 1,
+    borderColor: colors.primaryColor,
+  },
+  selectedFilterPill: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: colors.secondaryColor,
+    // borderWidth: 1,
+  },
+  filterText: {
+    fontSize: 14,
+    color: colors.black,
+    fontWeight: '500',
+  },
+  selectedFilterText: {
+    fontSize: 14,
+    color: colors.black,
+    fontWeight: '500',
   },
 });
 

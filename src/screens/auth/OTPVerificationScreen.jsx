@@ -6,6 +6,7 @@ import Timer from "../../components/timer/timer";
 import CustomButton from "../../components/customButton/CustomButton";
 import StaticNavigationHeader from "../../components/header/StaticNavigationHeader";
 import { isIOS } from "../../utils/BooleanUtility";
+import { assetsIcon } from "../../assets/Index";
 
 const OTPVerificationScreen = () => {
   const isIosDevice = isIOS();
@@ -36,7 +37,7 @@ const OTPVerificationScreen = () => {
       behavior={isIosDevice ? 'padding' : 'height'}
       keyboardVerticalOffset={isIosDevice ? 64 : 0}
     >
-      <StaticNavigationHeader title={'OTP'}/>
+      <StaticNavigationHeader title={'OTP'} iconSrc={assetsIcon.chevron_left} iconStyle={styles.iconStyle} buttonStyle={styles.buttonStyle} />
       <View style={styles.container}>
         {/* Title  */}
         <View style={styles.headerContainer}>
@@ -143,6 +144,19 @@ const styles = StyleSheet.create({
   timerContainer: {
     marginTop: 10,
   },
+  buttonStyle: {
+    // iOS shadow
+   shadowColor: colors.black,
+   shadowOffset: { width: 0, height: 2 },
+   shadowOpacity: 0.1,
+   shadowRadius: 3.84,
+   // Android shadow
+   elevation: 5,
+ },
+  iconStyle: {
+  width: 25, 
+  height: 25,
+ },
 })
 
 export default OTPVerificationScreen;

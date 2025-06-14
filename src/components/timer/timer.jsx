@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import { colors } from '../../theme/Colors';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import { isPresent } from '../../utils/BooleanUtility';
+import { assetsIcon } from '../../assets/Index';
 
 const Timer = ({ initialTime = 60, onTimeEnd, containerStyle }) => {
   const [timeLeft, setTimeLeft] = useState(initialTime);
@@ -47,7 +47,7 @@ const Timer = ({ initialTime = 60, onTimeEnd, containerStyle }) => {
 
   return (
     <View style={container}>
-      <Icon name='schedule' size={30} color={colors.dark_grey}/>
+      <Image source={assetsIcon.clock} style={styles.clock} />
       <Text style={styles.timerText}>{formatTime(timeLeft)}</Text>
     </View>
   );
@@ -67,6 +67,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: colors.dark_grey,
   },
+  clock: {
+    width: 20, 
+    height: 20, 
+    tintColor: colors.dark_grey, 
+    alignSelf:'center', 
+    marginRight: 10,
+  }
 });
 
 export default Timer;

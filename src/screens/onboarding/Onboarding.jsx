@@ -1,9 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet, ImageBackground, TouchableOpacity } from 'react-native';
-import { Images } from '../../assets/Index';
+import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, Image } from 'react-native';
+import { assetsIcon, Images } from '../../assets/Index';
 import { getScreenHeight, getScreenWidth } from '../../utils/LayoutUtility';
 import { colors } from '../../theme/Colors';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const Onboarding = () => {
   return (
@@ -22,7 +21,7 @@ const Onboarding = () => {
         <View style={styles.buttonContainer}>
           <View style={styles.buttonRing}>
             <TouchableOpacity style={styles.button}>
-              <Icon name="arrow-forward" size={30} color={colors.primaryColor} />
+              <Image source={assetsIcon.arrow_forward} style={styles.buttonIconStyle}/>
             </TouchableOpacity>
           </View>
         </View>
@@ -89,6 +88,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  buttonIconStyle: {
+    width: 25, 
+    height: 25, 
+    tintColor: colors.primaryColor,
+  }
 });
 
 export default Onboarding; 

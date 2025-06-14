@@ -1,12 +1,11 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { colors } from '../../theme/Colors';
 
-const StaticNavigationHeader = ({title, iconName = 'chevron-left', iconSize = 40, iconStyle = {}}) => {
+const StaticNavigationHeader = ({title, iconSrc, iconStyle = 40, buttonStyle = {}}) => {
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={[styles.iconContainer, iconStyle]}>
-        <Icon name={iconName} size={iconSize} color='black'/>
+      <TouchableOpacity style={[styles.iconContainer, buttonStyle]}>
+        <Image source={iconSrc} style={iconStyle} />
       </TouchableOpacity>
       <Text style={styles.title}>{title}</Text>
     </View>
