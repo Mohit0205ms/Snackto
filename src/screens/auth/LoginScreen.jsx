@@ -1,10 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, KeyboardAvoidingView } from 'react-native';
 import { colors } from '../../theme/Colors';
 import { getScreenWidth } from '../../utils/LayoutUtility';
 import CustomButton from '../../components/customButton/CustomButton';
 
 const LoginScreen = () => {
+  const [phoneNumber, setPhoneNumber] = useState(null);
+
+  const handleMobileNoChange = (event) => {
+    setPhoneNumber(event);
+  }
+
   return (
     <KeyboardAvoidingView>
       <View style={styles.container}>
@@ -16,9 +22,10 @@ const LoginScreen = () => {
             <TextInput
               style={styles.input}
               placeholder="Enter 10-digit mobile number"
-              keyboardType="phone-pad"
+              keyboardType="numeric"
               maxLength={10}
               placeholderTextColor={colors.dark_grey}
+              onChangeText={handleMobileNoChange}
             />
           </View>
         </View>
@@ -79,7 +86,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 16,
     fontSize: 16,
-    color: colors.primaryColor,
+    color: colors.black,
   },
   primaryButtonStyle: {
     width: getScreenWidth() - 48,

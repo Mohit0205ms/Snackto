@@ -1,107 +1,146 @@
-import {StyleSheet, Text, View, Image, TextInput} from 'react-native';
-import MapView, {Marker} from 'react-native-maps';
-import {getScreenHeight, getScreenWidth} from '../../utils/LayoutUtility';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Keyboard,
+} from 'react-native';
+import MapView, { Marker } from 'react-native-maps';
+import { getScreenHeight, getScreenWidth } from '../../utils/LayoutUtility';
 import StaticNavigationHeader from '../../components/header/StaticNavigationHeader';
-import {assetsIcon} from '../../assets/Index';
-import {colors} from '../../theme/Colors';
-import {FilterPills} from './AddressListScreen';
-import {useState} from 'react';
-import {isIOS} from '../../utils/BooleanUtility';
+import { assetsIcon } from '../../assets/Index';
+import { colors } from '../../theme/Colors';
+import { FilterPills } from './AddressListScreen';
+import { isIOS } from '../../utils/BooleanUtility';
 import CustomButton from '../../components/customButton/CustomButton';
-import {useAddressFromCoordinates} from '../../queries/mapQueries';
+import { useAddressFromCoordinates } from '../../queries/mapQueries';
 
 const SelectDeliveryAddressScreen = () => {
+  const scrollViewRef = useRef(null);
   const [selectedFilter, setSelectedFilter] = useState('Home');
   const [latitude, setLatitude] = useState(28.638863627859873);
   const [longitude, setLongitude] = useState(77.23187091336312);
-  const {data, isLoading, error} = useAddressFromCoordinates(
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const { data, isLoading, error } = useAddressFromCoordinates(
     latitude,
     longitude,
   );
 
   const changeRegion = Region => {
-    const {latitude, longitude} = Region;
+    const { latitude, longitude } = Region;
     setLatitude(latitude);
     setLongitude(longitude);
   };
 
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setKeyboardVisible(true);
+      },
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        scrollViewRef.current?.scrollTo({y: 0, animated: true})
+        setKeyboardVisible(false);
+      },
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
+
   return (
-    <View style={styles.container}>
-      <StaticNavigationHeader
-        iconSrc={assetsIcon.arrow_left}
-        title={'Editing Location'}
-        iconStyle={styles.iconStyle}
-        buttonStyle={styles.buttonStyle}
-      />
-      <View style={styles.mapContainer}>
-        <MapView
-          style={{width: '100%', height: '100%'}}
-          initialRegion={{
-            latitude: latitude,
-            longitude: longitude,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
-          }}
-          onRegionChange={changeRegion}
-          onRegionChangeComplete={changeRegion}>
-          <Marker
-            coordinate={{
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
+    >
+      <ScrollView
+        ref={scrollViewRef}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ paddingBottom: 30, flexGrow: 1 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <StaticNavigationHeader
+          iconSrc={assetsIcon.arrow_left}
+          title={'Editing Location'}
+          iconStyle={styles.iconStyle}
+          buttonStyle={styles.buttonStyle}
+        />
+        <View style={styles.mapContainer}>
+          <MapView
+            style={{ width: '100%', height: '100%' }}
+            initialRegion={{
               latitude: latitude,
               longitude: longitude,
+              latitudeDelta: 0.0922,
+              longitudeDelta: 0.0421,
             }}
-            image={assetsIcon.marker_pin}
-            title="Location"
-            description="Please select location"
-          />
-        </MapView>
-        <View style={styles.currentLocationContainer}>
-          <Image
-            source={assetsIcon.current_location}
-            style={{width: 25, height: 25}}
-          />
+            onRegionChange={changeRegion}
+            onRegionChangeComplete={changeRegion}
+          >
+            <Marker
+              coordinate={{
+                latitude: latitude,
+                longitude: longitude,
+              }}
+              image={assetsIcon.marker_pin}
+              title="Location"
+              description="Please select location"
+            />
+          </MapView>
+          <View style={styles.currentLocationContainer}>
+            <Image
+              source={assetsIcon.current_location}
+              style={{ width: 25, height: 25 }}
+            />
+          </View>
         </View>
-      </View>
-
-      <Text style={styles.locationHeader}>Location</Text>
-
-      <FilterPills
-        filters={['Home', 'Office', 'Others']}
-        selectedFilter={selectedFilter}
-        onFilterSelect={setSelectedFilter}
-      />
-
-      <View>
-        <View style={styles.addressFeild}>
+        <Text style={styles.locationHeader}>Location</Text>
+        <FilterPills
+          filters={['Home', 'Office', 'Others']}
+          selectedFilter={selectedFilter}
+          onFilterSelect={setSelectedFilter}
+        />
+        <View>
+          <View style={styles.addressFeild}>
+            <TextInput
+              style={styles.landMark}
+              placeholder="Enter 10-digit mobile number"
+              placeholderTextColor={colors.black}
+            />
+            <Image
+              source={assetsIcon.map_pointer}
+              style={{ width: 25, height: 25 }}
+            />
+          </View>
           <TextInput
-            style={styles.landMark}
-            placeholder="Enter 10-digit mobile number"
-            keyboardType="phone-pad"
+            style={styles.input}
+            placeholder="House No*"
             placeholderTextColor={colors.black}
           />
-          <Image
-            source={assetsIcon.map_pointer}
-            style={{width: 25, height: 25}}
+          <TextInput
+            style={styles.input}
+            placeholder="Floor/Nearby Landrmark"
+            placeholderTextColor={colors.black}
+          />
+          <CustomButton
+            primaryButtonText={'Save'}
+            primaryButtonStyle={styles.primaryButtonStyle}
+            showPrimaryButton={true}
           />
         </View>
-        <TextInput
-          style={styles.input}
-          placeholder="House No*"
-          keyboardType="phone-pad"
-          placeholderTextColor={colors.black}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Floor/Nearby Landrmark"
-          keyboardType="phone-pad"
-          placeholderTextColor={colors.black}
-        />
-        <CustomButton
-          primaryButtonText={'Save'}
-          primaryButtonStyle={styles.primaryButtonStyle}
-          showPrimaryButton={true}
-        />
-      </View>
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -115,7 +154,7 @@ const styles = StyleSheet.create({
   },
   buttonStyle: {
     shadowColor: colors.black,
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 3.84,
     elevation: 5,
