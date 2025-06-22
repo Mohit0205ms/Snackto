@@ -1,7 +1,8 @@
 import React, { memo, useState } from 'react';
-import { Image, StyleSheet } from 'react-native';
+import { Image, ImageBackground, StyleSheet } from 'react-native';
 import FastImage from '../libraries/ReactNativeFastImage';
 import ShimmerPlaceHolder from '../libraries/ReactNativeShimmerPlaceholder';
+import { isPresent } from '../utils/BooleanUtility';
 
 const FastImageView = ({ source, style, showLoader = false, children }) => {
   const [isLoading, setIsLoading] = useState(showLoader);
@@ -10,8 +11,10 @@ const FastImageView = ({ source, style, showLoader = false, children }) => {
   const onError = () => setIsLoading(false);
 
   const isGif = source?.uri?.toLowerCase().includes('.gif');
-  const ImageComponent = isGif ? Image : FastImage;
-
+  let ImageComponent = isGif ? Image : FastImage;
+  if (isPresent(children)) {
+    ImageComponent = ImageBackground;
+  }
   return (
     <>
       <ImageComponent
@@ -19,6 +22,7 @@ const FastImageView = ({ source, style, showLoader = false, children }) => {
         style={style}
         onLoadEnd={onLoadEnd}
         onError={onError}
+        resizeMode='cover'
       >
         {children}
       </ImageComponent>

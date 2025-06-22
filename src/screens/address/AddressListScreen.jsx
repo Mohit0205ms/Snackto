@@ -200,6 +200,7 @@ const AddressListScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    alignSelf: 'center'
   },
   iconStyle: {
     width: 25,

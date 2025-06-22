@@ -12,7 +12,9 @@ const LoginScreen = () => {
   }
 
   return (
-    <KeyboardAvoidingView>
+    <KeyboardAvoidingView
+      style={{flex:1, alignSelf: 'center'}}
+    >
       <View style={styles.container}>
         <View style={styles.contentContainer}>
           <Text style={styles.title}>Create your new{'\n'}account</Text>

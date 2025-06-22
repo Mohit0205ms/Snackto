@@ -34,6 +34,7 @@ const OTPVerificationScreen = () => {
 
   return(
     <KeyboardAvoidingView
+      style={{flex: 1,alignSelf: 'center'}}
       behavior={isIosDevice ? 'padding' : 'height'}
       keyboardVerticalOffset={isIosDevice ? 64 : 0}
     >
